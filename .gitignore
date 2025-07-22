@@ -1,0 +1,19 @@
+*.json
+# Node
+node_modules/
+.env
+last_lesson.json
+tmp/
+*.opus
+# VSCode
+.vscode/
+# Logs
+*.log
+npm-debug.log*
+# Sistema
+.DS_Store
+Thumbs.db
+# Auth/Secrets
+openai.key
+utils/openaiKey.js
+auth_info/
