@@ -42,7 +42,7 @@ module.exports = async function handleSpeechCommand({ chatId, sock, msg }) {
     const response = await axios.post(
       'https://api.openai.com/v1/audio/speech',
       {
-        model: 'tts-1',
+        model: 'tts-1-hd',
         input: texto,
         voice: 'onyx', // ou 'nova', 'echo', 'fable', 'alloy', etc.
         response_format: 'opus', // formato compatível com WhatsApp

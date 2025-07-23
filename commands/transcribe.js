@@ -10,7 +10,7 @@ async function transcribeAudio(filePath) {
       filename: path.basename(filePath),
       contentType: 'audio/ogg'
     });
-    formData.append('model', 'whisper-1');
+    formData.append('model', 'whisper-1'); // já é o mais barato para transcrição
     const headers = formData.getHeaders();
     const { getOpenAiApiKey } = require('../utils/openaiKey');
     headers['Authorization'] = `Bearer ${getOpenAiApiKey()}`;

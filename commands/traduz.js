@@ -32,7 +32,7 @@ module.exports = async function handleTraduzCommand({ chatId, sock, msg }) {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-3.5-turbo', // já é o mais barato para texto
         messages: [
           { role: 'system', content: 'Traduza todo o conteúdo a seguir para português, mantendo a formatação e os títulos:' },
           { role: 'user', content: toTranslate }

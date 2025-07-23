@@ -35,6 +35,7 @@ async function startBot() {
             const fromMe = msg.key.fromMe;
             const timestamp = msg.messageTimestamp ? new Date(Number(msg.messageTimestamp) * 1000).toLocaleString() : '-';
             const text = msg.message.conversation || msg.message.extendedTextMessage?.text || '';
+            /*
             console.log('==============================');
             console.log(`📥 Mensagem recebida:`);
             console.log(`  🕒 Data/Hora: ${timestamp}`);
@@ -43,7 +44,7 @@ async function startBot() {
             console.log(`  💬 ChatId: ${chatId}`);
             console.log(`  🙋‍♂️ Enviada por você? ${fromMe ? 'Sim' : 'Não'}`);
             console.log('==============================\n');
-
+            */
             // Reação temática por comando
             const react = async emoji => {
                 await sock.sendMessage(chatId, {
@@ -78,12 +79,12 @@ async function startBot() {
             } else if (text.trim().toLowerCase().startsWith('!speech')) {
                 await react('🔊');
                 await handleSpeechCommand({ chatId, sock, msg });
+            } else if (text.trim().toLowerCase().startsWith('!idioma')) {
+                await react('🌐');
+                await lessonIdiomaUniversalHandler({ text, chatId, sock, msg });
             } else if (text.trim().toLowerCase().startsWith('!lesson')) {
                 await react('📝');
                 await handleLessonCommand({ text, chatId, sock, msg });
-            } else if (text.trim().toLowerCase().startsWith('!lessonidioma')) {
-                await react('🌐');
-                await lessonIdiomaUniversalHandler({ text, chatId, sock, msg });
             } else if (text.trim().toLowerCase().startsWith('!traduz')) {
                 await react('🌎');
                 await handleTraduzCommand({ chatId, sock, msg });

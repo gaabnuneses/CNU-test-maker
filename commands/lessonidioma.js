@@ -28,13 +28,182 @@ async function lessonIdiomaUniversalHandler({ text, chatId, sock, msg }) {
     await sock.sendMessage(chatId, { text: '❌ API Key do OpenAI não configurada.' }, { quoted: msg });
     return;
   }
+
   const { idioma, nivel, tema } = parseArgs(text);
   console.log('--- [lessonidioma] Parâmetros extraídos:', { idioma, nivel, tema });
 
-  if (!idioma) {
-    await sock.sendMessage(chatId, { text: 'Uso: !lessonidioma idioma: <idioma> [nivel: <nível>] [tema: <tema>]\nExemplos:\n!lessonidioma idioma: italiano nivel: B1 tema: viagens\n!lessonidioma nivel: Avançado tema: animais idioma: francês\n!lessonidioma tema: contabilidade idioma: mandarim nivel: intermediário' }, { quoted: msg });
+  // Mapeamento simples de idiomas comuns para inglês (pode ser expandido)
+  const idiomaMap = {
+    'italiano': 'italian',
+    'francês': 'french',
+    'frances': 'french',
+    'espanhol': 'spanish',
+    'alemão': 'german',
+    'aleman': 'german',
+    'português': 'portuguese',
+    'portugues': 'portuguese',
+    'inglês': 'english',
+    'ingles': 'english',
+    'japonês': 'japanese',
+    'japones': 'japanese',
+    'mandarim': 'chinese',
+    'chinês': 'chinese',
+    'chines': 'chinese',
+    'russo': 'russian',
+    'árabe': 'arabic',
+    'arabe': 'arabic',
+    'coreano': 'korean',
+    'grego': 'greek',
+    'turco': 'turkish',
+    'hindi': 'hindi',
+    'hebraico': 'hebrew',
+    'polonês': 'polish',
+    'polones': 'polish',
+    'sueco': 'swedish',
+    'norueguês': 'norwegian',
+    'noruegues': 'norwegian',
+    'tcheco': 'czech',
+    'checo': 'czech',
+    'romeno': 'romanian',
+    'ucraniano': 'ukrainian',
+    'húngaro': 'hungarian',
+    'hungaro': 'hungarian',
+    'finlandês': 'finnish',
+    'finlandes': 'finnish',
+    'neerlandês': 'dutch',
+    'neerlandes': 'dutch',
+    'holandês': 'dutch',
+    'holandes': 'dutch',
+    'croata': 'croatian',
+    'búlgaro': 'bulgarian',
+    'bulgaro': 'bulgarian',
+    'dinamarquês': 'danish',
+    'dinamarques': 'danish',
+    'estoniano': 'estonian',
+    'letão': 'latvian',
+    'letao': 'latvian',
+    'lituano': 'lithuanian',
+    'eslovaco': 'slovak',
+    'esloveno': 'slovenian',
+    'servo': 'serbian',
+    'catalão': 'catalan',
+    'catalao': 'catalan',
+    'vietnamita': 'vietnamese',
+    'tailandês': 'thai',
+    'tailandes': 'thai',
+    'indonésio': 'indonesian',
+    'indonesio': 'indonesian',
+    'filipino': 'filipino',
+    'malaio': 'malay',
+    'persa': 'persian',
+    'urdu': 'urdu',
+    'bengali': 'bengali',
+    'tâmil': 'tamil',
+    'tamil': 'tamil',
+    'telugu': 'telugu',
+    'marata': 'marathi',
+    'gujarati': 'gujarati',
+    'canarês': 'kannada',
+    'canarese': 'kannada',
+    'panjabi': 'punjabi',
+    'punjabi': 'punjabi',
+    'malayalam': 'malayalam',
+    'birmanês': 'burmese',
+    'birmanes': 'burmese',
+    'laosiano': 'lao',
+    'cazaque': 'kazakh',
+    'uzbeque': 'uzbek',
+    'georgiano': 'georgian',
+    'armênio': 'armenian',
+    'armenio': 'armenian',
+    'mongol': 'mongolian',
+    'tibetano': 'tibetan',
+    'nepalês': 'nepali',
+    'nepales': 'nepali',
+    'sinhala': 'sinhala',
+    'cingalês': 'sinhala',
+    'cingales': 'sinhala',
+    'tagalo': 'tagalog',
+    'swahili': 'swahili',
+    'zulu': 'zulu',
+    'xhosa': 'xhosa',
+    'africâner': 'afrikaans',
+    'africaner': 'afrikaans',
+    'islandês': 'icelandic',
+    'islandes': 'icelandic',
+    'letão': 'latvian',
+    'letao': 'latvian',
+    'estoniano': 'estonian',
+    'esloveno': 'slovenian',
+    'eslovaco': 'slovak',
+    'búlgaro': 'bulgarian',
+    'bulgaro': 'bulgarian',
+    'croata': 'croatian',
+    'lituano': 'lithuanian',
+    'romeno': 'romanian',
+    'ucraniano': 'ukrainian',
+    'tcheco': 'czech',
+    'checo': 'czech',
+    'eslovaco': 'slovak',
+    'esloveno': 'slovenian',
+    'servo': 'serbian',
+    'catalão': 'catalan',
+    'catalao': 'catalan',
+    'vietnamita': 'vietnamese',
+    'tailandês': 'thai',
+    'tailandes': 'thai',
+    'indonésio': 'indonesian',
+    'indonesio': 'indonesian',
+    'filipino': 'filipino',
+    'malaio': 'malay',
+    'persa': 'persian',
+    'urdu': 'urdu',
+    'bengali': 'bengali',
+    'tâmil': 'tamil',
+    'tamil': 'tamil',
+    'telugu': 'telugu',
+    'marata': 'marathi',
+    'gujarati': 'gujarati',
+    'canarês': 'kannada',
+    'canarese': 'kannada',
+    'panjabi': 'punjabi',
+    'punjabi': 'punjabi',
+    'malayalam': 'malayalam',
+    'birmanês': 'burmese',
+    'birmanes': 'burmese',
+    'laosiano': 'lao',
+    'cazaque': 'kazakh',
+    'uzbeque': 'uzbek',
+    'georgiano': 'georgian',
+    'armênio': 'armenian',
+    'armenio': 'armenian',
+    'mongol': 'mongolian',
+    'tibetano': 'tibetan',
+    'nepalês': 'nepali',
+    'nepales': 'nepali',
+    'sinhala': 'sinhala',
+    'cingalês': 'sinhala',
+    'cingales': 'sinhala',
+    'tagalo': 'tagalog',
+    'swahili': 'swahili',
+    'zulu': 'zulu',
+    'xhosa': 'xhosa',
+    'africâner': 'afrikaans',
+    'africaner': 'afrikaans',
+    'islandês': 'icelandic',
+    'islandes': 'icelandic'
+  };
+
+  let idiomaNorm = idioma;
+  if (idiomaMap[idioma]) {
+    idiomaNorm = idiomaMap[idioma];
+  }
+  // Se o idioma não for reconhecido, avisa o usuário
+  if (!idiomaNorm || idiomaNorm.length < 2) {
+    await sock.sendMessage(chatId, { text: `❌ Idioma não reconhecido ou não suportado: "${idioma}". Tente usar o nome do idioma em português ou inglês.` }, { quoted: msg });
     return;
   }
+  console.log('--- [lessonidioma] Idioma normalizado para prompt:', idiomaNorm);
 
 
   // Prompt dinâmico e detalhado para qualquer idioma
@@ -42,24 +211,9 @@ async function lessonIdiomaUniversalHandler({ text, chatId, sock, msg }) {
 
 
 
-  let systemPrompt = `Você é um professor de idiomas especializado em criar lições para WhatsApp. Sempre siga esta estrutura e estas regras, adaptando tudo para o idioma alvo: ${idioma.toUpperCase()}.\n\n` +
-    `IMPORTANTE: Todas as partes da lição (texto, vocabulário, perguntas, respostas) devem estar em ${idioma.toUpperCase()}, NUNCA em inglês, exceto traduções para o português.\n` +
-    `NÃO escreva nada em inglês, a menos que o idioma alvo seja inglês.\n` +
-    `O texto da lição deve conter pelo menos um pequeno diálogo entre personagens, com falas marcadas por travessão ou aspas, para simular conversação real.\n` +
-    `O texto deve ser adequado para leitura em voz alta por TTS.\n` +
-    `Defina claramente um personagem ou narrador coerente (ex: "professora italiana simpática chamada Giulia" ou "professor francês animado chamado Pierre") e mantenha o mesmo estilo em todas as lições deste idioma.\n` +
-    `Se possível, use um estilo de fala natural e acolhedor, como um professor de verdade.\n` +
-    `Exemplo correto para italiano:\n- Texto: em italiano, com diálogo\n- Vocabulário: palavras em italiano, significado em português\n- Perguntas: enunciado e alternativas em italiano\n- Respostas: em italiano\nExemplo incorreto: qualquer parte em inglês.\n` +
-    `1. [AUDIO]: Gere um texto curto, natural, interessante e com diálogo em ${idioma} para a lição (8-15 linhas), usando apenas vocabulário e gramática apropriados para o nível solicitado (${nivel || 'A1-C2'}) e tema (${tema || 'aleatório'}). O texto deve ser contextual, relevante e adequado ao nível e tema. Destaque palavras novas ou importantes com *asteriscos* (ex: *palavra*). NÃO use palavras ou estruturas acima do nível pedido.\n` +
-    `2. [TEXT]: Forneça o mesmo texto do áudio, com as palavras destacadas por asteriscos.\n` +
-    `3. [PRONUNCIA]: Se o idioma alvo não usa o alfabeto latino, forneça o texto do áudio também em uma versão "jeito de falar" (transliteração para português brasileiro, sílaba a sílaba, para facilitar a pronúncia). Se o idioma usa o alfabeto latino, deixe este campo vazio.\n` +
-    `4. [VOCABULARY]: Liste todas as palavras destacadas, cada uma com uma definição simples em português brasileiro.\n` +
-    `5. [QUESTIONS]: Crie de 4 a 6 exercícios curtos sobre o texto, variando entre completar, múltipla escolha, perguntas diretas, sinônimos/antônimos, etc. Use sempre o idioma alvo (${idioma}) nos enunciados e respostas, exceto quando pedir tradução.\n` +
-    `6. [ANSWERS]: Dê a resposta correta para cada exercício.\n\n` +
-    `Formate sua resposta como JSON, sem comentários ou explicações fora do JSON:\n` +
-    `{"audio_text": "...", "text": "...", "pronuncia": "...", "vocab": [ { "word": "...", "meaning": "..." } ], "questions_title": "...", "questions": [ "..." ], "answers": [ "..." ]}`;
+  let systemPrompt = fs.readFileSync(path.join(__dirname, 'idiomaPrompt.txt'), 'utf8');
 
-  let userPrompt = `Gere uma lição COMPLETA no idioma ${idioma}. Todas as partes devem estar em ${idioma}, nunca em inglês, exceto traduções para o português. NÃO use inglês em nenhuma parte da lição, exceto se o idioma alvo for inglês.`;
+  let userPrompt =  `Crie uma lição completa no idioma ${idioma}. Todas as seções (audio_text, text, pronuncia, vocab, questions_title, questions, answers) devem estar inteiramente em ${idioma}, nunca em inglês, exceto as traduções para o português no campo "meaning". Use inglês somente se o idioma‑alvo for inglês.`;
   if (nivel) userPrompt += ` O nível é ${nivel}.`;
   if (tema) userPrompt += ` O tema é "${tema}".`;
   userPrompt += ' Siga rigorosamente o formato e as instruções.';
@@ -72,7 +226,7 @@ async function lessonIdiomaUniversalHandler({ text, chatId, sock, msg }) {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-4o',
+        model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -108,7 +262,7 @@ async function lessonIdiomaUniversalHandler({ text, chatId, sock, msg }) {
       const ttsResp = await axios.post(
         'https://api.openai.com/v1/audio/speech',
         {
-          model: 'tts-1',
+          model: 'tts-1-hd',
           input: lessonJson.audio_text,
           voice: 'nova',
           response_format: 'opus',
